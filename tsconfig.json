@@ -1,13 +1,5 @@
 {
-  "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "declaration": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "baseUrl": "src",
-    "resolveJsonModule": true,
-    "outDir": "dist"
-  },
-  "include": ["./src/index.ts", "./src/MultiCall.json"]
+  "extends": "./tsconfig.base.json",
+  "include": ["./src", "./test"],
+  "files": ["./hardhat.config.ts"]
 }
