@@ -3,7 +3,7 @@ pragma solidity ^0.6.0;
 pragma experimental ABIEncoderV2;
 
 
-contract MultiCall {
+contract MultiCallStrict {
   constructor(
     address[] memory targets,
     bytes[] memory datas
@@ -17,11 +17,8 @@ contract MultiCall {
       address target = targets[i];
       bytes memory data = datas[i];
       (bool success, bytes memory returnData) = target.call(data);
-      if (!success) {
-        returnDatas[i] = bytes("");
-      } else {
-        returnDatas[i] = returnData;
-      }
+      require(success, string(returnData));
+      returnDatas[i] = returnData;
     }
     bytes memory data = abi.encode(returnDatas);
     assembly { return(add(data, 32), data) }
