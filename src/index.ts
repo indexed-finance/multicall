@@ -19,6 +19,10 @@ function isJsonFragmentArray(input: any): input is JsonFragment[] {
   return false;
 }
 
+function isInterface(input: any): input is Interface {
+  return input._isInterface;
+}
+
 export class MultiCall {
   constructor(private provider: Provider) {}
 
@@ -27,7 +31,7 @@ export class MultiCall {
   public async multiCall(arg0: Interface | JsonFragment[] | CallInput[], arg1?: CallInput[] | boolean, arg2?: boolean) {
     let inputs: CallInput[] = [];
     let strict: boolean | undefined;
-    if (arg0 instanceof Interface || isJsonFragmentArray(arg0)) {
+    if (isInterface(arg0) || isJsonFragmentArray(arg0)) {
       if (!Array.isArray(arg1)) {
         throw new Error(`Second parameter must be array of call inputs if first is interface.`);
       }
@@ -49,7 +53,7 @@ export class MultiCall {
       if (!input.interface) {
         throw new Error(`Call input must include interface.`);
       }
-      if (input.interface instanceof Interface) {
+      if (isInterface(input.interface)) {
         _interface = input.interface;
       } else {
         _interface = new Interface(input.interface);
