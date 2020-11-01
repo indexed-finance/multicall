@@ -6,20 +6,45 @@ const { bytecode } = require("../artifacts/contracts/MultiCall.sol/MultiCall.jso
 
 export type CallInput = {
   target: string;
-  interface: Interface | JsonFragment[];
+  interface?: Interface | JsonFragment[];
   function: string;
   args: Array<any> | undefined;
+}
+
+function isJsonFragmentArray(input: any): input is JsonFragment[] {
+  if (!Array.isArray(input)) return false;
+  const callInputKeys = ['target', 'function', 'args'];
+  const inputKeys = Object.keys(input[0]);
+  for (let key of callInputKeys) {
+    if (!inputKeys.includes(key)) return true;
+  }
+  return false;
 }
 
 export class MultiCall {
   constructor(private provider: Provider) {}
 
-  public async multiCall(inputs: CallInput[]): Promise<any[]> {
+  public async multiCall(_interface: Interface | JsonFragment[], inputs: CallInput[]): Promise<any[]>;
+  public async multiCall(inputs: CallInput[]): Promise<any[]>;
+  public async multiCall(arg0: Interface | JsonFragment[] | CallInput[], arg1?: CallInput[]) {
+    let inputs: CallInput[] = [];
+    if (arg0 instanceof Interface || isJsonFragmentArray(arg0)) {
+      if (!arg1) throw new Error(`Second parameter must be array of call inputs if first is interface.`);
+      inputs = arg1;
+      for (let input of inputs) {
+        if (!input.interface) input.interface = arg0;
+      }
+    } else {
+      inputs = arg0;
+    }
     const targets: string[] = [];
     const datas: string[] = [];
     const interfaces: Interface[] = [];
     for (let input of inputs) {
       let _interface: Interface;
+      if (!input.interface) {
+        throw new Error(`Call input must include interface.`);
+      }
       if (input.interface instanceof Interface) {
         _interface = input.interface;
       } else {
