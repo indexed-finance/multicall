@@ -3,22 +3,19 @@ import { Provider } from "@ethersproject/providers";
 import { defaultAbiCoder, Interface } from "ethers/lib/utils";
 
 import { bytecode } from "./MultiCall.json";
-import { bytecode as bytecodeStrict } from "./MultiCall.json";
+import { bytecode as bytecodeStrict } from "./MultiCallStrict.json";
 
 export type CallInput = {
   target: string;
   interface?: Interface | JsonFragment[];
   function: string;
-  args: Array<any> | undefined;
+  args?: Array<any>;
 }
 
 function isJsonFragmentArray(input: any): input is JsonFragment[] {
   if (!Array.isArray(input)) return false;
-  const callInputKeys = ['target', 'function', 'args'];
   const inputKeys = Object.keys(input[0]);
-  for (let key of callInputKeys) {
-    if (!inputKeys.includes(key)) return true;
-  }
+  if (!inputKeys.includes('target') && !inputKeys.includes('function')) return true;
   return false;
 }
 
@@ -70,7 +67,7 @@ export class MultiCall {
     for (let i = 0; i < inputs.length; i++) {
       const returndata = returndatas[i];
       let result: any;
-      if (!strict && !returndata.length) {
+      if (!strict && returndata == '0x') {
         result = null;
       } else {
         result = interfaces[i].decodeFunctionResult(inputs[i].function, returndata)[0];
