@@ -2,7 +2,7 @@ import { JsonFragment } from "@ethersproject/abi";
 import { Provider } from "@ethersproject/providers";
 import { defaultAbiCoder, Interface } from "ethers/lib/utils";
 
-const { bytecode } = require("../artifacts/contracts/MultiCall.sol/MultiCall.json");
+import { bytecode } from "./MultiCall.json";
 
 export type CallInput = {
   target: string;
