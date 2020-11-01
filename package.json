@@ -1,6 +1,6 @@
 {
   "name": "@indexed-finance/multicall",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Solidity contract and typescript library for static multi-calls",
   "main": "dist/src/index.js",
   "types": "dist/index.d.ts",
@@ -19,17 +19,21 @@
     "ethereum-waffle": "^3.2.0",
     "hardhat": "^2.0.2",
     "mocha": "^8.2.0",
+    "rimraf": "^3.0.2",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   },
   "scripts": {
     "compile": "hardhat compile",
-    "prebuild": "npm run compile",
-    "build": "tsc",
-    "test": "hardhat test ./test/test.spec.ts",
+    "prebuild": "npm run compile && rimraf ./dist",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "hardhat test ./test/MultiCall.spec.ts",
     "prepublish": "npm run build"
   },
-  "keywords": ["Solidity", "Ethereum"],
+  "keywords": [
+    "Solidity",
+    "Ethereum"
+  ],
   "author": "",
   "license": "MIT"
 }
