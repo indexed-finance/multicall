@@ -3,6 +3,7 @@ import { Provider } from "@ethersproject/providers";
 import { defaultAbiCoder, Interface } from "ethers/lib/utils";
 
 import { bytecode } from "./MultiCall.json";
+import { bytecode as bytecodeStrict } from "./MultiCall.json";
 
 export type CallInput = {
   target: string;
@@ -24,18 +25,24 @@ function isJsonFragmentArray(input: any): input is JsonFragment[] {
 export class MultiCall {
   constructor(private provider: Provider) {}
 
-  public async multiCall(_interface: Interface | JsonFragment[], inputs: CallInput[]): Promise<any[]>;
-  public async multiCall(inputs: CallInput[]): Promise<any[]>;
-  public async multiCall(arg0: Interface | JsonFragment[] | CallInput[], arg1?: CallInput[]) {
+  public async multiCall(_interface: Interface | JsonFragment[], inputs: CallInput[], strict?: boolean): Promise<any[]>;
+  public async multiCall(inputs: CallInput[], strict?: boolean): Promise<any[]>;
+  public async multiCall(arg0: Interface | JsonFragment[] | CallInput[], arg1?: CallInput[] | boolean, arg2?: boolean) {
     let inputs: CallInput[] = [];
+    let strict: boolean | undefined;
     if (arg0 instanceof Interface || isJsonFragmentArray(arg0)) {
-      if (!arg1) throw new Error(`Second parameter must be array of call inputs if first is interface.`);
+      if (!Array.isArray(arg1)) {
+        throw new Error(`Second parameter must be array of call inputs if first is interface.`);
+      }
       inputs = arg1;
+
       for (let input of inputs) {
         if (!input.interface) input.interface = arg0;
       }
+      strict = arg2;
     } else {
       inputs = arg0;
+      strict = arg1 as boolean;
     }
     const targets: string[] = [];
     const datas: string[] = [];
@@ -56,15 +63,22 @@ export class MultiCall {
       targets.push(input.target);
     }
     const inputData = defaultAbiCoder.encode(['address[]', 'bytes[]'], [targets, datas]);
-    const fulldata = bytecode.concat(inputData.slice(2));
+    const fulldata = (strict ? bytecodeStrict : bytecode).concat(inputData.slice(2));
     const encodedReturnData = await this.provider.call({ data: fulldata });
     const returndatas = defaultAbiCoder.decode(['bytes[]'], encodedReturnData)[0];
     const results: any[] = [];
     for (let i = 0; i < inputs.length; i++) {
       const returndata = returndatas[i];
-      const result = interfaces[i].decodeFunctionResult(inputs[i].function, returndata)[0];
+      let result: any;
+      if (!strict && !returndata.length) {
+        result = null;
+      } else {
+        result = interfaces[i].decodeFunctionResult(inputs[i].function, returndata)[0];
+      }
       results.push(result);
     }
     return results;
   }
 }
+
+export default MultiCall;
