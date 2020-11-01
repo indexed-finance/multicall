@@ -25,4 +25,8 @@ contract TestContract {
     arr[1] = 2;
     ret = TestStruct(1e18, arr);
   }
+
+  function doRevert() public pure returns (uint256) {
+    revert("Triggered error D:");
+  }
 }
