@@ -13,10 +13,19 @@ contract TestContract {
     return uint256(1e20);
   }
 
+  function getUint2() public pure returns (uint256, uint256) {
+    return (uint256(1e18), uint256(1e19));
+  }
+
   function getUintArray() public pure returns (uint256[] memory arr) {
     arr = new uint256[](2);
     arr[0] = 1e20;
     arr[1] = 1e18;
+  }
+
+  function getUintArray2() public pure returns (uint256[] memory arr) {
+    arr = new uint256[](1);
+    arr[0] = 1e20;
   }
 
   function getStruct() public pure returns (TestStruct memory ret) {
