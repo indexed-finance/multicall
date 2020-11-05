@@ -74,7 +74,10 @@ export class MultiCall {
       if (!strict && returndata == '0x') {
         result = null;
       } else {
-        result = interfaces[i].decodeFunctionResult(inputs[i].function, returndata)[0];
+        result = interfaces[i].decodeFunctionResult(inputs[i].function, returndata);
+        if (Array.isArray(result) && result.length == 1) {
+          result = result[0];
+        }
       }
       results.push(result);
     }
