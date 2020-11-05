@@ -1,6 +1,6 @@
 {
   "name": "@indexed-finance/multicall",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Solidity contract and typescript library for static multi-calls",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
