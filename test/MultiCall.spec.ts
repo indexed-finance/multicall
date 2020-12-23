@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BigNumber, Contract } from 'ethers';
 import { ethers } from 'hardhat';
-import { CallInput, MultiCall } from '../src';
+import { CallInput, MultiCall } from '../dist';
 const { abi } = require('../artifacts/contracts/test/TestContract.sol/TestContract.json');
 
 describe('MultiCall', async () => {

@@ -1,6 +1,6 @@
 {
   "name": "@indexed-finance/multicall",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Solidity contract and typescript library for static multi-calls",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,9 +27,9 @@
   },
   "scripts": {
     "compile": "hardhat compile",
-    "prebuild": "npm run compile && rimraf ./dist",
+    "prebuild": "npm run compile && rimraf ./dist && node ./copy-bytecode.js",
     "build": "tsc -p tsconfig.build.json",
-    "test": "hardhat test ./test/MultiCall.spec.ts",
+    "test": "hardhat test",
     "prepublish": "npm run build"
   },
   "keywords": [
