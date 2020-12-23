@@ -9,6 +9,28 @@ contract TestContract {
     uint8[] b;
   }
 
+  uint112 internal reserve0;
+  uint112 internal reserve1;
+  uint32 internal blockTimestampLast;
+
+  function setReserves(uint112 r0, uint112 r1, uint32 time) external {
+    reserve0 = r0;
+    reserve1 = r1;
+    blockTimestampLast = time;
+  }
+
+  function balanceOf(address a) public pure returns (uint256) {
+    return uint(a);
+  }
+
+  function allowance(address a, address b) public pure returns (uint256) {
+    return uint(a) * uint(b);
+  }
+
+  function getReserves() external view returns (uint112, uint112, uint32) {
+    return (reserve0, reserve1, blockTimestampLast);
+  }
+
   function getUint() public pure returns (uint256) {
     return uint256(1e20);
   }
