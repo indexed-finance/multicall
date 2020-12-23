@@ -64,13 +64,15 @@ async function getMultiCallResults(provider, tokenMapAddress, tokens) {
 const multi = new MultiCall(provider);
 const tokens = [
   '0x6b175474e89094c44da98b954eedeac495271d0f', // dai
-  '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // weth
+  '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // weth
+  '0x0000000000000000000000000000000000000000' // eth
 ];
 const account = '0x0000000000000000000000000000000000000000';
 const balances = await multi.getBalances(tokens, account);
 
 const daiBalance = balances['0x6b175474e89094c44da98b954eedeac495271d0f'];
 const wethBalance = balances['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'];
+const ethBalance = balances['0x0000000000000000000000000000000000000000'];
 ```
 
 ## Querying Token Balances and Allowances
@@ -191,11 +193,11 @@ Promise<{
 
 ### `MultiCall.getBalances`
 
-The `MultiCall` class has a `getBalances` function which can query the balance of a single account for many tokens.
+The `MultiCall` class has a `getBalances` function which can query the balance of a single account for many tokens or ether.
 
 **Parameters**
 
-This function takes in an array of token addresses followed by the address of the account to query balances for.
+This function takes in an array of token addresses followed by the address of the account to query balances for. If the null address (`0x0000000000000000000000000000000000000000`) is provided as an input token, the balance returned will be the ether balance of `account`.
 
 ```ts
 getBalances(tokens: string[], account: string);
