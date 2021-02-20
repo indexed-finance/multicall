@@ -13,6 +13,10 @@ describe('MultiCall', async () => {
     multiCall = new MultiCall(ethers.provider);
   });
 
+  async function getBlockNumber(): Promise<number> {
+    return await ethers.provider.getBlockNumber();
+  }
+
   it('multiCall(inputs)', async () => {
     const baseInput: CallInput = {
       interface: testContract.interface,
@@ -27,7 +31,8 @@ describe('MultiCall', async () => {
       { ...baseInput, function: 'getStruct' },
       { ...baseInput, function: 'doRevert' }
     ];
-    const result = await multiCall.multiCall(inputs);
+    const [blockNumber, result] = await multiCall.multiCall(inputs);
+    expect(blockNumber).to.eq(await getBlockNumber());
     const [
       testuint,
       testuint2,
@@ -77,7 +82,8 @@ describe('MultiCall', async () => {
       { ...baseInput, function: 'getStruct' },
       { ...baseInput, function: 'doRevert' }
     ];
-    const result = await multiCall.multiCall(testContract.interface, inputs);
+    const [blockNumber, result] = await multiCall.multiCall(testContract.interface, inputs);
+    expect(blockNumber).to.eq(await getBlockNumber());
     const [
       testuint,
       testuint2,
@@ -126,7 +132,8 @@ describe('MultiCall', async () => {
       { ...baseInput, function: 'getStruct' },
       { ...baseInput, function: 'doRevert' }
     ];
-    const result = await multiCall.multiCall(abi, inputs);
+    const [blockNumber, result] = await multiCall.multiCall(abi, inputs);
+    expect(blockNumber).to.eq(await getBlockNumber());
     const [
       testuint,
       testuint2,

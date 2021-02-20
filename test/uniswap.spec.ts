@@ -17,6 +17,9 @@ describe('uniswap multicall', async () => {
     blockTimestampLast: 99000
   };
 
+  async function getBlockNumber(): Promise<number> {
+    return await ethers.provider.getBlockNumber();
+  }
 
   before(async () => {
     testContract1 = await (await ethers.getContractFactory('TestContract')).deploy();
@@ -34,7 +37,8 @@ describe('uniswap multicall', async () => {
   });
 
   it('getReserves(pairs)', async () => {
-    const allReserves = await getReserves(ethers.provider, [testContract1.address, testContract2.address]);
+    const [blockNumber, allReserves] = await getReserves(ethers.provider, [testContract1.address, testContract2.address]);
+    expect(blockNumber).to.eq(await getBlockNumber())
     const pair1 = allReserves[testContract1.address];
     const pair2 = allReserves[testContract2.address];
     expect(pair1).to.deep.eq(data1);
