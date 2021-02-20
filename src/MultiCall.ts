@@ -14,13 +14,13 @@ export class MultiCall {
     this.provider = toProvider(provider);
   }
 
-  public async multiCall(_interface: Interface | JsonFragment[], inputs: CallInput[], strict?: boolean): Promise<any[]>;
-  public async multiCall(inputs: CallInput[], strict?: boolean): Promise<any[]>;
-  public async multiCall(arg0: Interface | JsonFragment[] | CallInput[], arg1?: CallInput[] | boolean, arg2?: boolean): Promise<any[]> {
+  public async multiCall(_interface: Interface | JsonFragment[], inputs: CallInput[], strict?: boolean): Promise<[number, any[]]>;
+  public async multiCall(inputs: CallInput[], strict?: boolean): Promise<[number, any[]]>;
+  public async multiCall(arg0: Interface | JsonFragment[] | CallInput[], arg1?: CallInput[] | boolean, arg2?: boolean): Promise<[number, any[]]> {
     return multiCall(this.provider, arg0, arg1, arg2);
   }
 
-  public async getBalances(tokens: string[], account: string): Promise<TokenBalances> {
+  public async getBalances(tokens: string[], account: string): Promise<[number, TokenBalances]> {
     return getBalances(this.provider, tokens, account);
   }
 
@@ -28,11 +28,11 @@ export class MultiCall {
     tokens: string[],
     owner: string,
     spender: string
-  ): Promise<TokenBalancesAndAllowances> {
+  ): Promise<[number, TokenBalancesAndAllowances]> {
     return getBalancesAndAllowances(this.provider, tokens, owner, spender);
   }
 
-  public async getReserves(pairs: string[]): Promise<UniswapReservesData> {
+  public async getReserves(pairs: string[]): Promise<[number, UniswapReservesData]> {
     return getReserves(this.provider, pairs);
   }
 }
