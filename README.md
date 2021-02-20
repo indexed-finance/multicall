@@ -12,6 +12,8 @@ These are:
 - Querying the balance of a single account and the allowance that account has provided to a specific address for many ERC20 tokens
 - Querying the reserves of many Uniswap pairs
 
+All multicalls return the block number the data was pulled from.
+
 ## Install
 
 > npm install --save @indexed-finance/multicall
@@ -54,7 +56,8 @@ async function getMultiCallResults(provider, tokenMapAddress, tokens) {
   const tokenDatas = await multi.multiCall(abi, inputs);
   return tokenDatas;
 }
-// Result: Array<{ balance: BigNumber, decimals: number }>
+// Result: [number, Array<{ balance: BigNumber, decimals: number }>]
+// The first value is the block number the data was pulled from
 ```
 
 ## Querying Token Balances
@@ -68,7 +71,7 @@ const tokens = [
   '0x0000000000000000000000000000000000000000' // eth
 ];
 const account = '0x0000000000000000000000000000000000000000';
-const balances = await multi.getBalances(tokens, account);
+const [blockNumber, balances] = await multi.getBalances(tokens, account);
 
 const daiBalance = balances['0x6b175474e89094c44da98b954eedeac495271d0f'];
 const wethBalance = balances['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'];
@@ -91,7 +94,7 @@ const tokens = [
 const owner = '0x0000000000000000000000000000000000000000'
 const spender = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D' // uniswap router
 
-const balancesAndAllowances = await multi.getBalancesAndAllowances(tokens, owner, spender)
+const [blockNumber, balancesAndAllowances] = await multi.getBalancesAndAllowances(tokens, owner, spender)
 
 const {
   balance: daiBalance,
@@ -116,7 +119,7 @@ const pairs = [
   '0x004375dff511095cc5a197a54140a24efef3a416' // wbtc-usdc
 ]
 
-const reserves = await multi.getReserves(pairs);
+const [blockNumber, reserves] = await multi.getReserves(pairs);
 
 const {
   reserve0: daiWethR0,
@@ -159,14 +162,14 @@ If a call reverts, the default behavior for the contract is to return an empty `
 `multiCall` has two function signatures:
 
 ```ts
-multiCall(_interface: Interface | JsonFragment[], inputs: CallInput[], strict?: boolean): Promise<any[]>;
+multiCall(_interface: Interface | JsonFragment[], inputs: CallInput[], strict?: boolean): Promise<[number, any[]]>;
 
-multiCall(inputs: CallInput[], strict?: boolean): Promise<any[]>;
+multiCall(inputs: CallInput[], strict?: boolean): Promise<[number, any[]]>;
 ```
 
 **Response**
 
-The result will be a promise which resolves to an array with the decoded return data from each call. The data will be decoded by the ethers interface using whatever return types are defined in the ABI. If `strict: true` is not given, the result of any call that reverted will be `null`.
+The result will be a promise which resolves to an array with two values: the first is a `number` which is the block number the data was from, and the second is an array with the decoded return data from each call. The data will be decoded by the ethers interface using whatever return types are defined in the ABI. If `strict: true` is not given, the result of any call that reverted will be `null`.
 
 ### `MultiCall.getReserves`
 
@@ -178,17 +181,20 @@ The input parameter is an array of addresses of Uniswap pairs.
 
 **Response**
 
-The response from this function is a promise that resolves to an object with the Uniswap pair addresses as keys and a `UniswapPairReserves` type as values.
+The response from this function is a promise that resolves to an array with two values: the first is a `number` which is the block number the data was from, and the second is an object with the Uniswap pair addresses as keys and a `UniswapPairReserves` type as values.
 
 ```ts
 // response type
-Promise<{
-  [pair: string]: {
-    reserve0: BigNumber,
-    reserve1: BigNumber,
-    blockTimestamp: number
+Promise<[
+  number, // block number
+  {
+    [pair: string]: {
+      reserve0: BigNumber,
+      reserve1: BigNumber,
+      blockTimestamp: number
+    }
   }
-}>
+]>
 ```
 
 ### `MultiCall.getBalances`
@@ -205,13 +211,16 @@ getBalances(tokens: string[], account: string);
 
 **Response**
 
-The response from this function is a promise that resolves to an object with the token addresses as keys and `BigNumber` as values.
+The response from this function is a promise that resolves to an array with two values: the first is a `number` which is the block number the data was from, and the second is an object with the token addresses as keys and `BigNumber` as values.
 
 ```ts
 // response type
-Promise<{
-  [token: string]: BigNumber
-}>
+Promise<[
+  number, // block number
+  {
+    [token: string]: BigNumber
+  }
+]>
 ```
 
 ### `MultiCall.getBalancesAndAllowances`
@@ -228,14 +237,17 @@ getBalancesAndAllowances(tokens: string[], owner: string, spender: string)
 
 **Response**
 
-The response from this function is a promise that resolves to an object with the token addresses as keys and a `TokenBalanceAndAllowance` type as values.
+The response from this function is a promise that resolves to an array with two values: the first is a `number` which is the block number the data was from, and the second is an object with the token addresses as keys and a `TokenBalanceAndAllowance` type as values.
 
 ```ts
 // response type
-Promise<{
-  [token: string]: {
-    balance: BigNumber; // balance of `owner`
-    allowance: BigNumber; // amount `owner` has approved `spender` to spend
+Promise<[
+  number, // block number
+  {
+    [token: string]: {
+      balance: BigNumber; // balance of `owner`
+      allowance: BigNumber; // amount `owner` has approved `spender` to spend
+    }
   }
-}>
+]>
 ```
