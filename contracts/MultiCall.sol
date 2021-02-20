@@ -23,7 +23,7 @@ contract MultiCall {
         returnDatas[i] = returnData;
       }
     }
-    bytes memory data = abi.encode(returnDatas);
+    bytes memory data = abi.encode(block.number, returnDatas);
     assembly { return(add(data, 32), data) }
   }
 }

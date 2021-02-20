@@ -22,7 +22,7 @@ contract MultiTokenBalanceGetter {
         returnDatas[i] = IERC20(token).balanceOf(account);
       }
     }
-    bytes memory data = abi.encode(returnDatas);
+    bytes memory data = abi.encode(block.number, returnDatas);
     assembly { return(add(data, 32), data) }
   }
 }
