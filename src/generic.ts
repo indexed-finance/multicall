@@ -10,7 +10,7 @@ export async function multiCall(
   arg0: Interface | JsonFragment[] | CallInput[],
   arg1?: CallInput[] | boolean,
   arg2?: boolean
-): Promise<any[]> {
+): Promise<[number, any[]]> {
   const provider = toProvider(provider_);
   let inputs: CallInput[] = [];
   let strict: boolean | undefined;
@@ -49,7 +49,7 @@ export async function multiCall(
   const inputData = defaultAbiCoder.encode(['address[]', 'bytes[]'], [targets, datas]);
   const fulldata = (strict ? bytecodeStrict : bytecode).concat(inputData.slice(2));
   const encodedReturnData = await provider.call({ data: fulldata });
-  const returndatas = defaultAbiCoder.decode(['bytes[]'], encodedReturnData)[0];
+  const [blockNumber, returndatas] = defaultAbiCoder.decode(['uint256','bytes[]'], encodedReturnData);
   const results: any[] = [];
   for (let i = 0; i < inputs.length; i++) {
     const returndata = returndatas[i];
@@ -64,5 +64,5 @@ export async function multiCall(
     }
     results.push(result);
   }
-  return results;
+  return [blockNumber.toNumber(), results];
 }

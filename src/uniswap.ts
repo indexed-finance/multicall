@@ -6,12 +6,12 @@ import { UniswapReservesData } from './types';
 
 import { UniswapReservesGetter } from './bytecode.json'
 
-export async function getReserves(provider_: any, pairs: string[]): Promise<UniswapReservesData> {
+export async function getReserves(provider_: any, pairs: string[]): Promise<[number, UniswapReservesData]> {
   const provider = toProvider(provider_);
   const inputData = defaultAbiCoder.encode(['address[]'], [pairs]);
   const bytecode = UniswapReservesGetter.concat(inputData.slice(2));
   const encodedReturnData = await provider.call({ data: bytecode });
-  const decodedReturnData = defaultAbiCoder.decode(['bytes32[]'], encodedReturnData)[0];
+  const [blockNumber, decodedReturnData] = defaultAbiCoder.decode(['uint256', 'bytes32[]'], encodedReturnData);
 
   const allReserves: UniswapReservesData = {};
   for (let i = 0; i < pairs.length; i++) {
@@ -26,5 +26,5 @@ export async function getReserves(provider_: any, pairs: string[]): Promise<Unis
       blockTimestampLast: BigNumber.from(t_bytes).toNumber()
     };
   }
-  return allReserves;
+  return [blockNumber.toNumber(), allReserves];
 }

@@ -19,7 +19,7 @@ contract UniswapReservesGetter {
       (uint256 r0, uint256 r1, uint256 bt) = IUniswapV2Pair(pair).getReserves();
       returnDatas[i] = bytes32(r0 << 144 | r1 << 32 | bt);
     }
-    bytes memory data = abi.encode(returnDatas);
+    bytes memory data = abi.encode(block.number, returnDatas);
     assembly { return(add(data, 32), data) }
   }
 }
