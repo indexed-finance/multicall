@@ -28,6 +28,6 @@ contract MultiTokenBalanceAndAllowanceGetter {
       returnDatas[i] = values;
     }
     bytes memory data = abi.encode(block.number, returnDatas);
-    assembly { return(add(data, 32), data) }
+    assembly { return(add(data, 32), mload(data)) }
   }
 }
