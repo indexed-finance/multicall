@@ -20,6 +20,6 @@ contract UniswapReservesGetter {
       returnDatas[i] = bytes32(r0 << 144 | r1 << 32 | bt);
     }
     bytes memory data = abi.encode(block.number, returnDatas);
-    assembly { return(add(data, 32), data) }
+    assembly { return(add(data, 32), mload(data)) }
   }
 }
